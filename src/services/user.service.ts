@@ -2,7 +2,10 @@ import { User } from "../interfaces";
 import prisma from "../prisma";
 
 export class UserService {
-  static async getUsersPaginated(skip: number, take: number): Promise<{
+  static async getUsersPaginated(
+    skip: number,
+    take: number,
+  ): Promise<{
     users: User[];
     total: number;
   }> {

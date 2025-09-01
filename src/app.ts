@@ -7,6 +7,7 @@ import { successResponse } from "./utils/response";
 import { notFoundHandler } from "./middlewares/not-found.middleware";
 import { errorHandler, ApiError } from "./middlewares/error-handler.middleware";
 import v1Routes from "./routes/v1";
+import { loggerMiddleware } from "./middlewares/logger.middleware";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("combined"));
 // app.use(pinoHttp({ logger }));
+app.use(loggerMiddleware);
 
 /* ---------------- Routes ---------------- */
 app.get("/", (_req, res) => {

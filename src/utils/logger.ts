@@ -1,42 +1,44 @@
 import pino from "pino";
-import {config} from "../config/config";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import * as rfs from "rotating-file-stream";
+import { config } from "../config/config";
 
-// Recreate __dirname for ESM
+// Workaround for __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure logs directory exists
 const logDir = path.resolve(__dirname, "../logs");
+
+// Ensure logs directory exists
 if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
+  fs.mkdirSync(logDir, { recursive: true });
 }
 
-// Valid levels for reference: fatal, error, warn, info, debug, trace, silent
-const level = config.LOG_LEVEL;
-const validLevels = ["fatal","error","warn","info","debug","trace","silent"];
-const safeLevel = validLevels.includes(level ?? "")
-  ? (level as string)
-  : "info";
+const isDev = config.NODE_ENV !== "production";
 
-
-export const logger = pino({
-  level: safeLevel,
-  timestamp: pino.stdTimeFunctions.isoTime,
-  transport: {
-    targets: [
-      {
-        target: "pino/file",
-        level: "info",
-        options: { destination: path.join(logDir, "combined.log") },
-      },
-      {
-        target: "pino/file",
-        level: "error",
-        options: { destination: path.join(logDir, "error.log") },
-      },
-    ],
-  },
+// Setup rotating file stream for prod
+const stream = rfs.createStream("app.log", {
+  interval: "1d",
+  path: logDir,
+  maxFiles: 7,
 });
+
+export const logger = pino(
+  {
+    level: config.LOG_LEVEL || (isDev ? "debug" : "info"),
+    base: undefined,
+    timestamp: pino.stdTimeFunctions.isoTime,
+  },
+  isDev
+    ? pino.transport({
+        target: "pino-pretty",
+        options: {
+          colorize: true,
+          translateTime: "SYS:standard",
+          ignore: "pid,hostname",
+        },
+      })
+    : (stream as any), // rotating-file-stream
+);

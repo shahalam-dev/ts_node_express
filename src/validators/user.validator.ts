@@ -9,10 +9,7 @@ export const createUserSchema = z.object({
 
 export const getUserParamsSchema = z.object({
   params: z.object({
-    id: z.preprocess(
-      (val) => Number(val),
-      z.number().int().positive()
-    ),
+    id: z.preprocess((val) => Number(val), z.number().int().positive()),
   }),
 });
 

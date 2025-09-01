@@ -15,7 +15,7 @@ export interface ApiResponse<T = unknown> {
 export function successResponse<T>(
   data: T,
   message = "Request successful",
-  meta?: Meta
+  meta?: Meta,
 ): ApiResponse<T> {
   return {
     success: true,
@@ -25,10 +25,7 @@ export function successResponse<T>(
   };
 }
 
-export function errorResponse(
-  message: string,
-  error?: string
-): ApiResponse<null> {
+export function errorResponse(message: string, error?: string): ApiResponse<null> {
   return {
     success: false,
     message,

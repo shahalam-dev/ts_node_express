@@ -1,32 +1,52 @@
-// eslint.config.mjs
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
-import prettier from "eslint-config-prettier/flat"; // flat-config export
+import prettier from "eslint-config-prettier/flat";
 
 export default [
-  // Ignore build artifacts
-  { ignores: ["dist/**", "node_modules/**"] },
+  // Ignore build artifacts and generated files  
+  { 
+    ignores: [
+      "dist/**", 
+      "node_modules/**",
+      "src/generated/**", // Ignore Prisma generated files
+      "prisma/generated/**"
+    ] 
+  },
 
-  // JS/TS files
+  // Base configs for all files
   js.configs.recommended,
-
-  // TypeScript: base + typed rules via Project Service
+  
+  // TypeScript base rules (without type-checking)
   ...tseslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked, // enables rules that need types
+
+  // TypeScript with type-checking - ONLY for .ts files
   {
     files: ["**/*.ts"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        // New in typescript-eslint v8 – easier typed linting
         projectService: true
       }
     },
+    // Now we can safely use type-checked rules since parser is configured
     rules: {
-      // put your project-specific TS rules/tweaks here (optional)
+      // Core type-checked rules from recommendedTypeChecked
+      "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-for-in-array": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-assignment": "error", 
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
+      "@typescript-eslint/require-await": "error",
+      "@typescript-eslint/restrict-plus-operands": "error",
+      "@typescript-eslint/restrict-template-expressions": "error"
     }
   },
 
-  // Keep ESLint’s formatting rules from fighting Prettier
+  // Prettier (keep last to override formatting rules)
   prettier
 ];
