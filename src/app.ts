@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+// import pinoHttp from "pino-http";
+// import { logger } from "./utils/logger.js";
 import { successResponse } from "./utils/response";
 import { notFoundHandler } from "./middlewares/not-found.middleware";
 import { errorHandler, ApiError } from "./middlewares/error-handler.middleware";
@@ -11,7 +13,8 @@ const app = express();
 /* ---------------- Middleware ---------------- */
 app.use(express.json());
 app.use(cors());
-app.use(morgan("dev"));
+app.use(morgan("combined"));
+// app.use(pinoHttp({ logger }));
 
 /* ---------------- Routes ---------------- */
 app.get("/", (_req, res) => {
