@@ -1,5 +1,5 @@
 import { User } from "../interfaces";
-import prisma from "../prisma";
+import prisma from "../lib/prisma";
 
 export class UserService {
   static async getUsersPaginated(
