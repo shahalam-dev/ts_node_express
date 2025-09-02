@@ -8,6 +8,7 @@ import { notFoundHandler } from "./middlewares/not-found.middleware";
 import { errorHandler, ApiError } from "./middlewares/error-handler.middleware";
 import v1Routes from "./routes/v1";
 import { loggerMiddleware } from "./middlewares/logger.middleware";
+import { sendEmail } from "./utils/mailer";
 
 const app = express();
 
@@ -21,6 +22,15 @@ app.use(loggerMiddleware);
 /* ---------------- Routes ---------------- */
 app.get("/", (_req, res) => {
   res.json(successResponse({ version: "1.0.0" }, "Welcome to API"));
+});
+
+app.get("/send-mail", async (_req, res) => {
+  await sendEmail(
+    "sshahalam.dev@gmail.com",
+    "test SMTP from Node.js",
+    `<p>test mail from back office software</p>`,
+  );
+  res.json(successResponse({}, "Email sent"));
 });
 
 app.use("/api/v1", v1Routes);
